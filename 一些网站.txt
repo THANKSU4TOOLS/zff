@@ -1,0 +1,14 @@
+高德开发平台：
+https://lbs.amap.com/
+
+
+数据来源网站：
+https://medpage.maps.arcgis.com/apps/opsdashboard/index.html#/c7dafaae988f4c07a13a9ede90e43a47%20%20
+
+
+在线json格式转换：
+https://www.bejson.com/
+
+
+HTML颜色网站：
+https://htmlcolorcodes.com/zh/
