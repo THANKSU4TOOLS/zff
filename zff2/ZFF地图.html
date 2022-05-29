@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<link rel="stylesheet" type="text/css" href="CSS/index.css" />
+		<title>ZFF地图</title>
+	</head>
+	<body>
+		<script src="http://webapi.amap.com/maps?v=1.4.15&key=4e11222740d3dc05778fa2f8b313120e"></script>
+		<script src="http://webapi.amap.com/loca?v=1.3.2&key=4e11222740d3dc05778fa2f8b313120e"></script>
+		<script type="text/javascript" src="JS/data.js"></script>
+		<script type="text/javascript" src="JS/InfoWin.js"></script>
+		<input type="button" id="btn" value="图层控制" onclick="kaiguan()"/>
+		<div id="map" class="container">
+			
+		</div>
+
+
+		<script type="text/javascript">
+			/********************一、创建底图*********************/
+
+			//通过 AMap.Map 创建底图'mymap'
+			//底图样式为：'amap://styles/dark' 1	https://lbs.amap.com/api/javascript-api/guide/map/map-style/
+			//初始缩放级别为：4.5
+			//中心为:[-100, 40]
+			var mymap = new AMap.Map('map',{
+				mapStyle:'amap://styles/normal',
+				zoom:4.5,
+				center:[113.322546,23.1]
+			})
+			
+
+			/*****************二、创建散点数据图层****************/
+
+			//通过Loca.PointLayer创建图层 'mylayer'
+			//图层底图设置为mymap
+			//打开事件支持
+			var mylayer = new Loca.PointLayer({
+				map:mymap,
+				eventSupport:true
+			})
+			/*****************三、传入原始数据******************/
+
+			//通过setData函数传入数据
+			//数据源参数:'data'
+			//数据类型:'json'
+			//经纬度(必填):'Long_'  'Lat'
+			mylayer.setData(data,{
+				type:'json',
+				lnglat:function(obj){
+							return [obj.value.x, obj.value.y]
+				}
+			})
+			
+
+
+
+			/******************四、配置样式*********************/
+
+			//通过setOptions函数来配置样式
+			//单位: 'px' (像素)
+			//风格:
+			//	半径:	按额定容量来分
+			//	颜色:	按照负载率来分
+			//边框宽度: 0.5px
+			//边框颜色: 随意
+			mylayer.setOptions({
+				unit:'px',
+				style:{
+					radius:(obj)=>{
+						var num = obj.value.ratedCapacity;
+						if(num>= 1) return 30;
+						else if(num>=0.8) return 25;
+						else if(num>=0.6) return 20;
+						else if(num>=0.4) return 15;
+						else if(num>=0.1) return 10;
+						else return 5;
+					},
+					color:(obj)=>{
+						var num = obj.value.ratedCapacity;
+						if(num>= 1) return '#ff0000';
+						else if(num>=0.8) return '#ff3500';
+						else if(num>=0.6) return '#ff7700';
+						else if(num>=0.4) return '#ff8800';
+						else if(num>=0.1) return '#ffaa00';
+						else return '#ffff00';
+					}
+				},
+				borderWidth:0.5,
+				borderColor:'#0000ff'	
+			})
+
+			//渲染图层
+			mylayer.render();
+			// mylayer.hide() //  图层隐藏
+			// mylayer.show() //  图层显示
+			var flag = 1;
+			function kaiguan(){
+				if(flag ==1){
+					mylayer.hide();
+					flag = 0;
+				}else{
+					mylayer.show();
+					flag =1;
+				}			
+			}
+
+
+			/*******************五、绑定事件*******************/
+
+			//为mylayer图层绑定点击事件(click)
+			//获取所点击要素的原始数据 并打印出来
+			//获取所点击要素的原始鼠标事件
+			//调用openInfoWin函数,打开信息窗口
+			//		'名称': 
+			// 		'型号': 
+			// 		'负载率1': 
+			// 		'负载率2': 
+			mylayer.on('click',function(ev){
+							var rawData = ev.rawData;
+							console.log(rawData);
+							var originalEvent = ev.originalEvent;
+							openInfoWin(mymap,originalEvent,{
+								'名称': rawData.GZ,
+								'型号': rawData.model,
+								'2021max负载率': rawData.TYPE,
+								'2022max负载率': rawData.TYPE
+							})
+						})
+			
+
+
+
+
+
+			/****绑定事件,以关闭信息窗口****/
+			//调用closeInfoWin函数,关闭信息窗口
+			mymap.on('click',function(ev){
+							closeInfoWin();
+						})
+			
+			
+			
+			
+			
+		</script>
+	</body>
+</html>
